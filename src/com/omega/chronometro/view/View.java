@@ -2,7 +2,6 @@ package com.omega.chronometro.view;
 
 import com.omega.chronometro.contador.Contador;
 import com.omega.chronometro.utils.Constantes;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -13,9 +12,13 @@ public class View extends JFrame {
     private JButton buttonParar;
     private JLabel lblTempo;
     private JTextArea textArea1;
+    private JLabel lblTmpPausa;
+    private JScrollPane scrollpaneLog;
     private JPopupMenu popupMenu;
+    public static View instance = null;
 
     public View() {
+        super("StopWatch 1.0");
         setContentPane(contentPane);
         setAlwaysOnTop(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -56,12 +59,21 @@ public class View extends JFrame {
                 }
             }
         });
+        textArea1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (MouseEvent.BUTTON3 == e.getButton()) {
+                    popupMenu.show(contentPane, e.getX(), e.getY());
+                }
+            }
+        });
     }
 
     private void initPopup(){
         popupMenu = new JPopupMenu();
         JMenuItem mnuConfig = new JMenuItem("Configurações");
         JMenuItem mnuTimerMaximo = new JMenuItem("Tempo Máximo");
+        final JMenuItem  mnuHide = new JMenuItem("hide Log");
         mnuTimerMaximo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,8 +81,24 @@ public class View extends JFrame {
                 Constantes.contadorPrinc.setMax(Integer.parseInt(valorMaximo));
             }
         });
+
+        mnuHide.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (scrollpaneLog.isVisible()) {
+                    scrollpaneLog.setVisible(false);
+                    getInstance().pack();
+                    mnuHide.setText("show Log");
+                } else {
+                    scrollpaneLog.setVisible(true);
+                    getInstance().pack();
+                    mnuHide.setText("hide Log");
+                }
+            }
+        });
         popupMenu.add(mnuConfig);
         popupMenu.add(mnuTimerMaximo);
+        popupMenu.add(mnuHide);
     }
 
     private void onStartPause() {
@@ -82,27 +110,59 @@ public class View extends JFrame {
             Constantes.contadorPrinc.setStarted(false);
             buttonOK.setText("Iniciar");
             if(Constantes.contadorSecund == null){
-                Constantes.contadorSecund = new Contador(new JLabel("secundario"));
+                Constantes.contadorSecund = new Contador(lblTmpPausa);
+                Constantes.contadorSecund.start();
             }
-            String motivo = JOptionPane.showInputDialog(null, "informe o motivo da pausa", "Posso saber porque pausar?", JOptionPane.QUESTION_MESSAGE);
-            Constantes.log.append("\n"+Constantes.contadorPrinc.getTime() +" - pausa - "+ motivo);
+            String motivo = JOptionPane.showInputDialog(null, "Informe o motivo da pausa", "Posso saber porque pausar?", JOptionPane.QUESTION_MESSAGE);
+            Constantes.log.append("\n"+Constantes.getAtualTime() + " - "+Constantes.contadorPrinc.getTime() +" - pausa "+ motivo);
             Constantes.contadorSecund.setStarted(true);
         } else {
+            if(Constantes.contadorSecund != null && Constantes.contadorSecund.isStarted()){
+                Constantes.log.append("\n"+Constantes.getAtualTime() + " - Retomado após - "+Constantes.contadorSecund.getTime());
+                Constantes.contadorSecund.setStarted(false);
+                Constantes.contadorSecund.setZerado(true);
+            }
 
-            Constantes.log.append("\n"+Constantes.contadorSecund.getTime()+" - Tempo de pausa");
-            Constantes.contadorSecund.setStarted(false);
-            Constantes.contadorSecund.setZerado(true);
             Constantes.contadorPrinc.setStarted(true);
+            lblTmpPausa.setText("00:00:00");
             buttonOK.setText("Pausar");
+            buttonParar.setEnabled(true);
         }
 
     }
 
     private void onParar() {
-        Constantes.contadorPrinc.setStarted(false);
-        Constantes.contadorPrinc.setZerado(true);
-        lblTempo.setText("00:00:00");
+        if(Constantes.contadorPrinc != null){
+            Constantes.contadorPrinc.setStarted(false);
+            Constantes.contadorPrinc.setZerado(true);
+        }
+
+        if(Constantes.contadorSecund != null){
+            Constantes.contadorSecund.setStarted(false);
+            Constantes.contadorSecund.setZerado(true);
+        }
+
+        if(!buttonParar.getText().equals("Parar")){
+            lblTempo.setText("00:00:00");
+            lblTmpPausa.setText("00:00:00");
+            buttonParar.setText("Parar");
+            buttonParar.setEnabled(false);
+            Integer resp = JOptionPane.showConfirmDialog(null, "Deseja limpar o Log?");
+            if(resp == 0 && Constantes.log != null){
+                Constantes.log.setText("");
+            }
+        }else{
+            buttonParar.setText("Zerar");
+        }
+
         buttonOK.setText("Iniciar");
+    }
+
+    public static View getInstance(){
+        if(instance == null){
+            instance = new View();
+        }
+        return instance;
     }
 
     public static void main(String[] args) {
@@ -112,9 +172,8 @@ public class View extends JFrame {
             System.out.print("não foi possivel setar a interface windows");
         }
 
-        View dialog = new View();
-        dialog.pack();
-        dialog.setVisible(true);
+        getInstance().pack();
+        getInstance().setVisible(true);
 
     }
 }
