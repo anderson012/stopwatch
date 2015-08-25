@@ -69,11 +69,11 @@ public class View extends JFrame {
         });
     }
 
-    private void initPopup(){
+    private void initPopup() {
         popupMenu = new JPopupMenu();
         JMenuItem mnuConfig = new JMenuItem("Configurações");
         JMenuItem mnuTimerMaximo = new JMenuItem("Tempo Máximo");
-        final JMenuItem  mnuHide = new JMenuItem("hide Log");
+        final JMenuItem mnuHide = new JMenuItem("hide Log");
         mnuTimerMaximo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,16 +109,18 @@ public class View extends JFrame {
         if (Constantes.contadorPrinc.isStarted()) {
             Constantes.contadorPrinc.setStarted(false);
             buttonOK.setText("Iniciar");
-            if(Constantes.contadorSecund == null){
+            if (Constantes.contadorSecund == null) {
                 Constantes.contadorSecund = new Contador(lblTmpPausa);
+                Constantes.contadorSecund.setZerado(true);
                 Constantes.contadorSecund.start();
+
             }
             String motivo = JOptionPane.showInputDialog(null, "Informe o motivo da pausa", "Posso saber porque pausar?", JOptionPane.QUESTION_MESSAGE);
-            Constantes.log.append("\n"+Constantes.getAtualTime() + " - "+Constantes.contadorPrinc.getTime() +" - pausa "+ motivo);
+            Constantes.log.append("\n" + Constantes.getAtualTime() + " - " + Constantes.contadorPrinc.getTime() + " - pausa " + motivo);
             Constantes.contadorSecund.setStarted(true);
         } else {
-            if(Constantes.contadorSecund != null && Constantes.contadorSecund.isStarted()){
-                Constantes.log.append("\n"+Constantes.getAtualTime() + " - Retomado após - "+Constantes.contadorSecund.getTime());
+            if (Constantes.contadorSecund != null && Constantes.contadorSecund.isStarted()) {
+                Constantes.log.append("\n" + Constantes.getAtualTime() + " - Retomado após - " + Constantes.contadorSecund.getTime());
                 Constantes.contadorSecund.setStarted(false);
                 Constantes.contadorSecund.setZerado(true);
             }
@@ -132,34 +134,36 @@ public class View extends JFrame {
     }
 
     private void onParar() {
-        if(Constantes.contadorPrinc != null){
-            Constantes.contadorPrinc.setStarted(false);
-            Constantes.contadorPrinc.setZerado(true);
-        }
 
-        if(Constantes.contadorSecund != null){
-            Constantes.contadorSecund.setStarted(false);
-            Constantes.contadorSecund.setZerado(true);
-        }
-
-        if(!buttonParar.getText().equals("Parar")){
+        if (!buttonParar.getText().equals("Parar")) {
             lblTempo.setText("00:00:00");
             lblTmpPausa.setText("00:00:00");
             buttonParar.setText("Parar");
             buttonParar.setEnabled(false);
             Integer resp = JOptionPane.showConfirmDialog(null, "Deseja limpar o Log?");
-            if(resp == 0 && Constantes.log != null){
+            if (resp == 0 && Constantes.log != null) {
                 Constantes.log.setText("");
             }
-        }else{
+        } else {
             buttonParar.setText("Zerar");
+            Constantes.log.append("\n" + Constantes.getAtualTime() + " - parado após " + Constantes.contadorPrinc.getTime());
+        }
+
+        if (Constantes.contadorPrinc != null) {
+            Constantes.contadorPrinc.setStarted(false);
+            Constantes.contadorPrinc.setZerado(true);
+        }
+
+        if (Constantes.contadorSecund != null) {
+            Constantes.contadorSecund.setStarted(false);
+            Constantes.contadorSecund.setZerado(true);
         }
 
         buttonOK.setText("Iniciar");
     }
 
-    public static View getInstance(){
-        if(instance == null){
+    public static View getInstance() {
+        if (instance == null) {
             instance = new View();
         }
         return instance;
@@ -167,7 +171,7 @@ public class View extends JFrame {
 
     public static void main(String[] args) {
         try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e1) {
             System.out.print("não foi possivel setar a interface windows");
         }

@@ -1,8 +1,7 @@
 package com.omega.chronometro.contador;
 
-import com.omega.chronometro.utils.Constantes;
-
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by Anderson on 20/08/2015.
@@ -24,23 +23,24 @@ public class Contador extends Thread {
             int segundo = 0;
             int hora = 0;
             int minuto = 0;
-            while( true ) {
-                if(isStarted()) {
-                    if(isZerado()) {
+            while (true) {
+                if (isStarted()) {
+                    this.hr.setForeground(new Color(0, 0, 0));
+                    if (isZerado()) {
                         segundo = 0;
                         hora = 0;
                         minuto = 0;
                         setZerado(false);
                     }
 
-                    if( segundo == 59 ){
+                    if (segundo == 59) {
                         segundo = 00;
-                        minuto = minuto+1;
+                        minuto = minuto + 1;
                     }
 
-                    if( minuto == 59 ){
+                    if (minuto == 59) {
                         minuto = 00;
-                        hora = hora+1;
+                        hora = hora + 1;
                     }
                     segundo++;
                     String timer = completaComZero(hora) + ":" +
@@ -49,6 +49,15 @@ public class Contador extends Thread {
                     this.time = timer;
                     this.hr.setText(timer);
                     this.hr.revalidate();
+                } else {
+                    if (!isZerado()) {
+                        if(!this.hr.getForeground().equals(new Color(211, 48, 54))){
+                            this.hr.setForeground(new Color(211, 48, 54));
+                        }else{
+                            this.hr.setForeground(new Color(0, 0, 0));
+                        }
+
+                    }
                 }
                 Thread.sleep(1000);
             }
@@ -91,8 +100,8 @@ public class Contador extends Thread {
 
     private String completaComZero(Integer i) {
         String retorno = null;
-        if( i < 10 ) {
-            retorno = "0"+i;
+        if (i < 10) {
+            retorno = "0" + i;
         } else {
             retorno = i.toString();
         }
