@@ -4,6 +4,7 @@ import com.omega.chronometro.contador.Contador;
 import com.omega.chronometro.utils.Constantes;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class View extends JFrame {
@@ -105,6 +106,7 @@ public class View extends JFrame {
         if (Constantes.contadorPrinc == null) {
             Constantes.contadorPrinc = new Contador(lblTempo);
             Constantes.contadorPrinc.start();
+            Constantes.contadorPrinc.setZerado(true);
         }
         if (Constantes.contadorPrinc.isStarted()) {
             Constantes.contadorPrinc.setStarted(false);
@@ -126,6 +128,9 @@ public class View extends JFrame {
             }
 
             Constantes.contadorPrinc.setStarted(true);
+            if(Constantes.contadorPrinc.isZerado()){
+                Constantes.log.append(Constantes.getAtualTime() + " - Iniciado Contagem");
+            }
             lblTmpPausa.setText("00:00:00");
             buttonOK.setText("Pausar");
             buttonParar.setEnabled(true);
@@ -137,6 +142,7 @@ public class View extends JFrame {
 
         if (!buttonParar.getText().equals("Parar")) {
             lblTempo.setText("00:00:00");
+            lblTempo.setForeground(new Color(0, 0, 0));
             lblTmpPausa.setText("00:00:00");
             buttonParar.setText("Parar");
             buttonParar.setEnabled(false);
