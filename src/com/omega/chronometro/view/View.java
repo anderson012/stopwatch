@@ -19,7 +19,7 @@ public class View extends JFrame {
     public static View instance = null;
 
     public View() {
-        super("StopWatch 1.0");
+        super("StopWatch 1.1.0");
         setContentPane(contentPane);
         setAlwaysOnTop(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -36,10 +36,11 @@ public class View extends JFrame {
             }
         });
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 dispose();
+                Constantes.saveLog();
             }
         });
 
