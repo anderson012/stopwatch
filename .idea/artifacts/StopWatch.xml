@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="StopWatch">
+    <output-path>$PROJECT_DIR$/artifacts/StopWatch</output-path>
+    <root id="archive" name="chronometro.jar">
+      <element id="module-output" name="chronometro" />
+    </root>
+  </artifact>
+</component>
